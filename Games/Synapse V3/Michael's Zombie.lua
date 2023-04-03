@@ -205,7 +205,7 @@ Main:AddToggle({Name = "Always Headshot", Default = Settings.Main.AlwaysHeadshot
     Settings.Main.AlwaysHeadshot = val
     SaveSettings()
 end})
-Main:AddToggle({Name = "Auto Reload", Default = Settings.Main.AlwaysHeadshot, Callback = function(val)
+Main:AddToggle({Name = "Auto Reload", Default = Settings.Main.AutoReload, Callback = function(val)
     Settings.Main.AutoReload = val
     SaveSettings()
     task.spawn(function()
@@ -300,7 +300,7 @@ Esp:AddToggle({Name = "Parts ESP", Default = Settings.Esp.Parts, Callback = func
 end})
 Esp:AddSeperator()
 
-Library:Init("Blood")
+Library:Init()
 
 task.spawn(function()
     local mt = getrawmetatable(game)
