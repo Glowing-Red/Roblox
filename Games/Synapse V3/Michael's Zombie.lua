@@ -196,12 +196,7 @@ end)
 local Window = Library:MakeWindow({
     Name = "Michael's Zombies",
     DefaultSize = Vector2.new(290, 300),
-    CanResize = true,
-    Color = {
-        {{5,10,11,20,23,27,32,35}, Color3.fromRGB(190, 0, 0), 1};
-        {{12,18,19,21,30,33}, Color3.fromRGB(175, 0, 0), 1};
-        {{22,31,34}, Color3.fromRGB(160, 0, 0), 1};
-    }
+    CanResize = true
 })
 local Main = Window:AddTab({Name = "Main"})
 local Esp = Window:AddTab({Name = "Esp"})
@@ -304,6 +299,8 @@ Esp:AddToggle({Name = "Parts ESP", Default = Settings.Esp.Parts, Callback = func
     ESP.Parts = Settings.Esp.Parts
 end})
 Esp:AddSeperator()
+
+Library:Init("Blood")
 
 task.spawn(function()
     local mt = getrawmetatable(game)
