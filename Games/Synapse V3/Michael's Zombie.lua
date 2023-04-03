@@ -195,6 +195,7 @@ end)
 
 local Window = Library:MakeWindow({
     Name = "Michael's Zombies",
+    DefaultSize = Vector2.new(290, 300),
     CanResize = true,
     Color = {
         {{5,10,11,20,23,27,32,35}, Color3.fromRGB(190, 0, 0), 1};
