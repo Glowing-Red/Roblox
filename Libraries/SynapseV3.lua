@@ -54,11 +54,8 @@ function SynapseV3:MakeWindow(Configs)
     Configs.Visible = typeof(Configs.Visible) == "boolean" and Configs.Visible or nil
     Configs.Color = typeof(Configs.Color) == "table" and Configs.Color or {}
     
-    assert(RenderWindow)
     local Window = RenderWindow.new(Configs.Name)
-    local module = {}
-    shared[Configs.Name] = module
-    module.RenderWindow = Window
+    SynapseV3.RenderWindow = Window
 
     for i,v in next, Configs do
         if not table.find({"Name", "Color"}, i) then
@@ -78,6 +75,7 @@ function SynapseV3:MakeWindow(Configs)
 
     local Tabs = Window:TabMenu()
     local WindowFunctions = {}
+    SynapseV3.RenderTabMenu = Tabs
     function WindowFunctions:AddTab(Configs)
         Configs = typeof(Configs) == "table" and Configs or {}
         Configs.Name = typeof(Configs.Name) == "string" and Configs.Name or RngChars(Rng:NextInteger(5, 15))
@@ -124,6 +122,25 @@ function SynapseV3:MakeWindow(Configs)
             Slider.Clamped = true
             Slider.OnUpdated:Connect(Configs.Callback)
         end
+        function TabFunctions:AddDropdown(Configs)
+            Configs = typeof(Configs) == "table" and Configs or {}
+            Configs.Name = typeof(Configs.Name) == "string" and Configs.Name or RngChars(Rng:NextInteger(5, 10))
+            Configs.List = typeof(Configs.List) == "table" and #Configs.List > 0 and Configs.List or {"Option 1", "Option 2", "Option 3"}
+            Configs.Default = table.find(Configs.List, Configs.Default) or 1
+            Configs.Refresh = typeof(Configs.Refresh) == "boolean" and Configs.Refresh or true
+            Configs.Callback = typeof(Configs.Callback) == "function" and Configs.Callback or function(val) print(val) end
+            
+            local Dropdown = Tab:Combo()
+            Dropdown.Label = Configs.Name
+            Dropdown.Items = Configs.List
+            Dropdown.SelectedItem = Configs.Default
+            if Configs.Refresh then
+                pcall(Configs.Callback, Dropdown.Items[Dropdown.SelectedItem])
+            end
+            Dropdown.OnUpdated:Connect(function(i)
+                pcall(Configs.Callback, Dropdown.Items[i])
+            end)
+        end
         function TabFunctions:AddSeperator()
             Tab:Separator()
         end
@@ -131,4 +148,35 @@ function SynapseV3:MakeWindow(Configs)
     end
     return WindowFunctions
 end
+
+function SynapseV3:Init()
+    if not self.RenderTabMenu then
+        return
+    end
+    local ThemesRepo = "https://raw.githubusercontent.com/Glowing-Red/Roblox/main/Libraries/SynapseV3/Themes/%s.lua"
+    local ThemeList = {"Classic", "Blood"}
+    local SetTheme = function(Name)
+        local Theme = loadstring(syn.request({Method = "GET", Url = (ThemesRepo):format(Name)}).Body)() or {}
+        Theme.Colour = Theme.Colour or {}
+        Theme.Style = Theme.Style or {}
+        for i,v in Theme.Colour do
+            self.RenderWindow:SetColor(RenderColorOption[i], v.Colour, v.Alpha)
+        end
+        for i,v in Theme.Style do
+            self.RenderWindow:SetStyle(RenderStyleOption[i], v)
+        end
+    end
+
+    SetTheme(ThemeList[1])
+
+    local Tab = self.RenderTabMenu:Add("Themes")
+    local Dropdown = Tab:Combo()
+    Dropdown.Label = "Themes"
+    Dropdown.Items = ThemeList
+    Dropdown.SelectedItem = 1
+    Dropdown.OnUpdated:Connect(function(i)
+        SetTheme(Dropdown.Items[i])
+    end)
+end
+
 return SynapseV3
