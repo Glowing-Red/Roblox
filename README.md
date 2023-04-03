@@ -2,5 +2,4 @@ Warning: Anything that occurs during/after the usage of anything within this rep
 
 Information: I will not take credit for anything you find within here because it's mostly the result of me learning from other people script's or re-using parts of them.
 
-Discord: Himiko Toga#0001
-<@486585359208022029>
+Discord: Himiko Toga#0001 \n<@486585359208022029>
