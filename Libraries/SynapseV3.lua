@@ -149,14 +149,12 @@ function SynapseV3:MakeWindow(Configs)
     return WindowFunctions
 end
 
-function SynapseV3:Init(Theme)
+function SynapseV3:Init()
     if not self.RenderTabMenu then
         return
     end
     local ThemesRepo = "https://raw.githubusercontent.com/Glowing-Red/Roblox/main/Libraries/SynapseV3/Themes/%s.lua"
     local ThemeList = {"Classic", "Blood"}
-    local Theme = table.find(ThemeList, Theme) and Theme or ThemeList[1]
-    print(Theme)
     local function SetTheme(Name)
         local Theme = loadstring(syn.request({Method = "GET", Url = (ThemesRepo):format(Name)}).Body)() or {}
         Theme.Colour = Theme.Colour or {}
@@ -169,7 +167,7 @@ function SynapseV3:Init(Theme)
         end
     end
 
-    SetTheme(Theme)
+    SetTheme(ThemeList[1])
 
     local Tab = self.RenderTabMenu:Add("Themes")
     local Dropdown = Tab:Combo()
