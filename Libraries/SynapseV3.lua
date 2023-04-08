@@ -55,7 +55,8 @@ function SynapseV3:MakeWindow(Configs)
     Configs.Color = typeof(Configs.Color) == "table" and Configs.Color or {}
     
     local Window = RenderWindow.new(Configs.Name)
-    SynapseV3.RenderWindow = Window
+    shared[Configs.Name] = self
+    self.RenderWindow = Window
 
     for i,v in next, Configs do
         if not table.find({"Name", "Color"}, i) then
@@ -153,8 +154,9 @@ function SynapseV3:Init()
     if not self.RenderTabMenu then
         return
     end
-    local ThemeList = syn.request({Method = "GET", Url = "https://raw.githubusercontent.com/Glowing-Red/Roblox/main/Libraries/SynapseV3/Themes%20List.lua"}).Body
+    local ThemeList = loadstring(syn.request({Method = "GET", Url = "https://raw.githubusercontent.com/Glowing-Red/Roblox/main/Libraries/SynapseV3/Themes%20List.lua"}).Body)()
     local function SetTheme(Name)
+        Name = table.find(ThemeList, Name) and Name or ThemeList[1]
         local Theme = loadstring(syn.request({Method = "GET", Url = ("https://raw.githubusercontent.com/Glowing-Red/Roblox/main/Libraries/SynapseV3/Themes/%s.lua"):format(Name)}).Body)() or {}
         Theme.Colour = Theme.Colour or {}
         Theme.Style = Theme.Style or {}
