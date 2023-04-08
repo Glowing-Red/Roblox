@@ -153,10 +153,9 @@ function SynapseV3:Init()
     if not self.RenderTabMenu then
         return
     end
-    local ThemesRepo = "https://raw.githubusercontent.com/Glowing-Red/Roblox/main/Libraries/SynapseV3/Themes/%s.lua"
-    local ThemeList = {"Classic", "Blood"}
+    local ThemeList = syn.request({Method = "GET", Url = "https://raw.githubusercontent.com/Glowing-Red/Roblox/main/Libraries/SynapseV3/Themes%20List.lua"}).Body
     local function SetTheme(Name)
-        local Theme = loadstring(syn.request({Method = "GET", Url = (ThemesRepo):format(Name)}).Body)() or {}
+        local Theme = loadstring(syn.request({Method = "GET", Url = ("https://raw.githubusercontent.com/Glowing-Red/Roblox/main/Libraries/SynapseV3/Themes/%s.lua"):format(Name)}).Body)() or {}
         Theme.Colour = Theme.Colour or {}
         Theme.Style = Theme.Style or {}
         for i,v in Theme.Colour do
