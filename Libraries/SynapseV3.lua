@@ -86,19 +86,26 @@ function SynapseV3:MakeWindow(Configs)
             Configs = typeof(Configs) == "table" and Configs or {}
             Configs.Name = typeof(Configs.Name) == "string" and Configs.Name or RngChars(Rng:NextInteger(5, 20))
             Configs.Size = typeof(Configs.Size) == "Vector2" and Configs.Size or nil
+            Configs.Visible = typeof(Configs.Visible) == "boolean" and Configs.Visible or typeof(Configs.Visible) ~= "boolean" and true
             Configs.Callback = typeof(Configs.Callback) == "function" and Configs.Callback or function() print(("%s has been pressed"):format(Configs.Name)) end
             
             local Button = Tab:Button()
+            Button.Visible = Configs.Visible
             Button.Label = Configs.Name
             if Configs.Size then
                 Button.Size = Configs.Size
             end
             Button.OnUpdated:Connect(Configs.Callback)
+            local ButtonFunctions = {}
+            function ButtonFunctions:UpdateVisible(Visible)
+                Button.Visible = typeof(Visible) == "boolean" and Visible or typeof(Visible) ~= "boolean" and true
+            end
+            return ButtonFunctions
         end
         function TabFunctions:AddToggle(Configs)
             Configs = typeof(Configs) == "table" and Configs or {}
             Configs.Name = typeof(Configs.Name) == "string" and Configs.Name or RngChars(Rng:NextInteger(5, 15))
-            Configs.Default = typeof(Configs.Default) == "boolean" and Configs.Default or false
+            Configs.Default = typeof(Configs.Default) == "boolean" and Configs.Default or typeof(Configs.Default) ~= "boolean" and false
             Configs.Callback = typeof(Configs.Callback) == "function" and Configs.Callback or function(val) print(("%s: %s"):format(Configs.Name, tostring(val))) end
             
             local Toggle = Tab:CheckBox()
@@ -128,7 +135,7 @@ function SynapseV3:MakeWindow(Configs)
             Configs.Name = typeof(Configs.Name) == "string" and Configs.Name or RngChars(Rng:NextInteger(5, 10))
             Configs.List = typeof(Configs.List) == "table" and #Configs.List > 0 and Configs.List or {"Option 1", "Option 2", "Option 3"}
             Configs.Default = table.find(Configs.List, Configs.Default) or 1
-            Configs.Refresh = typeof(Configs.Refresh) == "boolean" and Configs.Refresh or true
+            Configs.Refresh = typeof(Configs.Refresh) == "boolean" and Configs.Refresh or typeof(Configs.Refresh) ~= "boolean" and true
             Configs.Callback = typeof(Configs.Callback) == "function" and Configs.Callback or function(val) print(val) end
             
             local Dropdown = Tab:Combo()
@@ -144,6 +151,18 @@ function SynapseV3:MakeWindow(Configs)
         end
         function TabFunctions:AddSeperator()
             Tab:Separator()
+        end
+        function TabFunctions:AddLabel(Name)
+            local Name = typeof(Name) == "string" and Name or RngChars(Rng:NextInteger(5, 15))
+            local Label = Tab:Label(Name)
+            local LabelFunctions = {}
+            function LabelFunctions:UpdateLabel(Name)
+                Label.Label = typeof(Name) == "string" and Name or RngChars(Rng:NextInteger(5, 15))
+            end
+            function LabelFunctions:UpdateVisible(Visible)
+                Label.Visible = typeof(Visible) == "boolean" and Visible or typeof(Visible) ~= "boolean" and true
+            end
+            return LabelFunctions
         end
         return TabFunctions
     end
