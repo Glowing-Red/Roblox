@@ -429,6 +429,7 @@ local pages = {
         page:WaitForChild("HelpFrameKeyboardMouse").Visible = false
         for i,v in pairs(ButtonsFolder:GetChildren()) do
             if v:GetAttribute("Type") ~= nil then
+                repeat wait() until v.Parent ~= nil
                 v.Parent = page
                 SetTheme(page)
                 v.Visible = true
@@ -438,6 +439,7 @@ local pages = {
         end
         Connect(ButtonsFolder.ChildAdded, function(v)
             if v:GetAttribute("Type") ~= nil then
+                repeat wait() until v.Parent ~= nil
                 v.Parent = page
                 SetTheme(page)
                 v.Visible = true
