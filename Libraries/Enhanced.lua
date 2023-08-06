@@ -11,8 +11,8 @@ local ButtonsFolder = Instance.new("Folder")
 
 local plrgui = plr:WaitForChild("PlayerGui")
 local rblxgui = game.CoreGui:WaitForChild("RobloxGui")
-local shield = rblxgui:WaitForChild("SettingsShield"):WaitForChild("SettingsShield")
-local HelpTab = shield.MenuContainer:WaitForChild("HubBar"):WaitForChild("HubBarContainer"):WaitForChild("HelpTab")
+local shield = rblxgui:WaitForChild("SettingsClippingShield"):WaitForChild("SettingsShield")
+local HelpTab = shield:WaitForChild("MenuContainer"):WaitForChild("HubBar"):WaitForChild("HubBarContainer"):WaitForChild("HelpTab")
 local pageview = shield:WaitForChild("MenuContainer"):WaitForChild("PageViewClipper"):WaitForChild("PageView"):WaitForChild("PageViewInnerFrame")
 
 HelpTab:WaitForChild("Icon"):WaitForChild("Title").Text = "Home"
