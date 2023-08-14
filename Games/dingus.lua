@@ -60,7 +60,7 @@ local VersionData,Versions,CurrentVersion = {
 		" + Added \"Pepsi\""
 	},
 	["Version 2.2.0"] = {
-		"--// Hunter > Miscellaneous",
+		"--// Hider > Miscellaneous",
 		" + Added \"Hidden Animations\""
 	},
 	["Version 2.1.0"] = {
