@@ -736,8 +736,7 @@ function OrionLib:MakeWindow(WindowConfig)
 				AnchorPoint = Vector2.new(0, 0.5),
 				Size = UDim2.new(0, 18, 0, 18),
 				Position = UDim2.new(0, 10, 0.5, 0),
-				ImageTransparency = 0.4,
-                Visible = false,
+				ImageTransparency = 1,
 				Name = "Ico"
 			}), "Text"),
 			AddThemeObject(SetProps(MakeElement("Label", TabConfig.Name, 14), {
@@ -771,7 +770,6 @@ function OrionLib:MakeWindow(WindowConfig)
 		if FirstTab then
 			FirstTab = false
             
-            TabFrame.Ico.Visible = true
 			TabFrame.Ico.ImageTransparency = 0
 			TabFrame.Title.TextTransparency = 0
 			TabFrame.Title.Font = Enum.Font.GothamBlack
@@ -785,11 +783,6 @@ function OrionLib:MakeWindow(WindowConfig)
 
 					TweenService:Create(Tab.Ico, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {ImageTransparency = 1}):Play()
 					TweenService:Create(Tab.Title, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {TextTransparency = 0.4}):Play()
-                    
-                    task.spawn(function()
-                        task.wait(0.25)
-                        Tab.Ico.Visible = false
-                    end)
 				end
 			end
 
@@ -799,9 +792,7 @@ function OrionLib:MakeWindow(WindowConfig)
 				end    
 			end
 
-            TabFrame.Ico.Visible = true
-
-			TweenService:Create(TabFrame.Ico, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {ImageTransparency = 0}):Play()
+            TweenService:Create(TabFrame.Ico, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {ImageTransparency = 0}):Play()
 			TweenService:Create(TabFrame.Title, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
 			
             TabFrame.Title.Font = Enum.Font.GothamBlack
