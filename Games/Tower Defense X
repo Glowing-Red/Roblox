@@ -1,0 +1,472 @@
+repeat wait() until game:IsLoaded()
+if game.GameId ~= 3541611379 then
+    return
+end
+
+local Start = tick()
+
+local Settings = {
+    Macro = {
+        Activated = false;
+        Path = "...";
+    };
+}
+--[[ 9503261072, 11739766412
+local MapData = require(game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("MapData"))
+local Maps = {}
+
+for i,_ in pairs(MapData) do
+   table.insert(Maps, tostring(i)) 
+end]]
+
+local Maps = {"Ancient Sky Island", "Cow Annoyance", "Military Harbor", "Misleading Pond", "Volcanic Mishap", "Vapor City", "Oil Rig", "Unforgiving Winter", "Obscure Island", "SFOTH", "Danger Beach", "Secret Forest", "Winter Fort", "Blox Out", "Deserted Island", "Apocalypse"}
+
+local F1 = "Chronicle"
+local F2 = "Tower Defense X"
+local L1 = "Settings.json"
+local F3 = "Macro"
+
+function SaveSettings()
+    local c = game:GetService("HttpService")
+    local d = c:JSONEncode(Settings)
+    if writefile then
+        if isfolder(F1) and isfolder(F2) then
+            writefile(F1.."/"..F2.."/"..L1, d)
+        else
+            if not isfolder(F1) then
+                makefolder(F1)
+            end
+            
+            if not isfolder(F2) then
+                makefolder(F1.."/"..F2)
+            end
+            
+            writefile(F1.."/"..F2.."/"..L1, d)
+        end
+        
+        if not isfolder(F3) then
+            makefolder(F1.."/"..F2.."/"..F3)
+        end
+    end
+end
+
+function LoadSettings()
+    local c = game:GetService("HttpService")
+    
+    if isfile(F1.."/"..F2.."/"..L1) then
+        for i, v in pairs(c:JSONDecode(readfile(F1.."/"..F2.."/"..L1))) do
+            if type(v) == "table" then 
+                for i2, v2 in pairs(v) do
+                    Settings[i][i2] = v2
+                end
+            else
+                Settings[i] = v
+            end
+        end
+    end
+end
+
+LoadSettings()
+SaveSettings()
+
+function GetMacroFiles()
+    local macroFiles = listfiles(F1.."/".. F2.."/".. F3)
+    local files = {}
+    
+    for _,v in ipairs(macroFiles) do
+        local parts = {}
+        
+        for part in v:gmatch("[^/\\]+") do
+            table.insert(parts, part)
+        end
+        
+        table.insert(files, parts[#parts])
+    end
+    
+    return files
+end
+
+function concatenateLoadout(towers)
+    local result = ""
+    
+    for i, tower in ipairs(towers) do
+        result = result .. tower
+        if i < #towers then
+            result = result .. ", "
+        end
+    end
+    
+    return result
+end
+
+function GetTime(timeString)
+    local hours, minutes, seconds = 0, 0, 0
+    
+    local parts = {}
+    for part in timeString:gmatch("%d+") do
+        table.insert(parts, tonumber(part))
+    end
+
+    if #parts == 1 then
+        seconds = parts[1]
+    elseif #parts == 2 then
+        minutes, seconds = parts[1], parts[2]
+    elseif #parts == 3 then
+        hours, minutes, seconds = parts[1], parts[2], parts[3]
+    else
+        return -1
+    end
+    
+    local totalSeconds = hours * 3600 + minutes * 60 + seconds
+    return totalSeconds
+end
+
+function GetWave(waveString)
+    local waveNumber = waveString:match("%d+")
+    
+    if waveNumber then
+        return tonumber(waveNumber)
+    else
+        return -1
+    end
+end
+
+local Library = loadstring(game:HttpGet(('https://raw.githubusercontent.com/Glowing-Red/Roblox/main/Libraries/Voreon.lua')))()
+local Window = Library:MakeWindow({Name = "Chronicle: Tower Defense X", HidePremium = false, SaveConfig = false, IntroEnabled = false})
+
+if game.PlaceId == 11739766412 then
+    local PlayerGui = game.Players.LocalPlayer.PlayerGui
+    local Interface = PlayerGui:WaitForChild("Interface")
+    
+    local waveLabel = Interface.GameInfoBar.Wave.WaveText
+    local timeLabel = Interface.GameInfoBar.TimeLeft.TimeLeftText
+    
+    function isValidInput(inputText)
+        return inputText:match("^[%a%s]+$") ~= nil and inputText:match("%a") ~= nil and inputText:match("%s+") ~= inputText and #inputText >= 3
+    end
+    
+    function RecordMacro(fileName, mapName)
+        local FileName = fileName..".json"
+        local macro = {
+            ["Map"] = mapName,
+            ["Loadout"] = {},
+            ["Recorded"] = {}
+        }
+        
+        local previousBalance = 0
+        local Cash = game.Players.LocalPlayer.leaderstats.Cash
+        
+        function SaveRecording()
+            local c = game:GetService("HttpService")
+            local d = c:JSONEncode(macro)
+            if writefile then
+                if isfolder(F1) and isfolder(F1.."\\"..F2) and isfolder(F1.."\\"..F2.."\\"..F3) then
+                    writefile(F1.."\\"..F2.."\\"..F3.."\\"..FileName, d)
+                else
+                    if not isfolder(F1) then
+                        makefolder(F1)
+                    end
+                    if not isfolder(F2) then
+                        makefolder(F1.."\\"..F2)
+                    end
+                    if not isfolder(F3) then
+                        makefolder(F1.."\\"..F2.."\\"..F3)
+                    end
+                    
+                    writefile(F1.."\\"..F2.."\\"..F3.."\\"..FileName, d)
+                end
+            end
+        end
+        
+        task.spawn(function()
+            while task.wait(1) do
+                SaveRecording()
+            end
+        end)
+        
+        task.spawn(function()
+            local mt = getrawmetatable(game)
+            local old = mt.__namecall
+            
+            setreadonly(mt, false)
+            
+            mt.__namecall = function(self, ...)
+                local args = {...}
+                
+                if getnamecallmethod() == "FireServer" or getnamecallmethod() == "InvokeServer" then
+                    if (tostring(self) == "DifficultyVoteCast") then
+                        table.insert(macro.Recorded, {type = "Difficulty", Difficulty = args[1]})
+                    elseif (tostring(self) == "DifficultyVoteReady") then
+                        table.insert(macro.Recorded, {type = "Vote"})
+                    elseif (tostring(self) == "SkipWaveVoteCast") then
+                        table.insert(macro.Recorded, {type = "Skip", Bool = args[1], Wave = GetWave(waveLabel.Text), Time = GetTime(timeLabel.Text)})
+                    elseif (tostring(self) == "PlaceTower") then
+                        if not table.find(macro.Loadout, args[2]) then
+                            table.insert(macro.Loadout, args[2])
+                        end
+                        
+                        table.insert(macro.Recorded, {type = "Place", Tower = args[2], Cost = 999, Number = tostring(args[1]), Position = tostring(args[3]), Int = tostring(args[4])})
+                    elseif (tostring(self) == "TowerUpgradeRequest") then
+                        table.insert(macro.Recorded, {type = "Upgrade", Tower = args[1], Path = args[2], Cost = 999})
+                    elseif (tostring(self) == "SellTower") then
+                        table.insert(macro.Recorded, {type = "Sell", Tower = args[1], Wave = GetWave(waveLabel.Text), Time = GetTime(timeLabel.Text)})
+                    elseif (tostring(self) == "ChangeQueryType") then
+                        table.insert(macro.Recorded, {type = "Targetting", Tower = args[1], Targetting = args[2], Wave = GetWave(waveLabel.Text), Time = GetTime(timeLabel.Text)})
+                    elseif (tostring(self) == "TowerUseAbilityRequest") then
+                        table.insert(macro.Recorded, {type = "Ability", Tower = args[1], Ability = args[2], Wave = GetWave(waveLabel.Text), Time = GetTime(timeLabel.Text)})
+                    end
+                end
+                
+                return old(self, unpack(args))
+            end
+            
+            setreadonly(mt, true)
+        end)
+    end
+
+    function LoadMacro(Filename)
+        local macro = game:GetService("HttpService"):JSONDecode(readfile(Filename))
+        
+        function ToVector3(stringInput)
+            return Vector3.new(unpack(game:GetService('HttpService'):JSONDecode('['..stringInput..']')))
+        end
+        
+        local PlayerGui = game.Players.LocalPlayer.PlayerGui
+        local Interface = PlayerGui:WaitForChild("Interface")
+        
+        local waveLabel = Interface.GameInfoBar.Wave.WaveText
+        local timeLabel = Interface.GameInfoBar.TimeLeft.TimeLeftText
+        local Cash = game.Players.LocalPlayer.leaderstats.Cash
+        
+        task.spawn(function()
+            while task.wait(.25) do
+                if Step >= #macro.Recorded + 1 then
+                    break
+                end
+                
+                if macro.Recorded[Step].type == "Difficulty" then
+                    game:GetService("ReplicatedStorage").Remotes.DifficultyVoteCast:FireServer(macro.Recorded[Step].Difficulty)
+                    Step = Step + 1
+                elseif macro.Recorded[Step].type == "Vote" then
+                    game:GetService("ReplicatedStorage").Remotes.DifficultyVoteReady:FireServer()
+                    Step = Step + 1
+                elseif macro.Recorded[Step].type == "Skip" and ( (GetWave(waveLabel.Text) == tonumber(macro.Recorded[Step].Wave) and GetTime(timeLabel) <= tonumber(macro.Recorded[Step].Time)) or GetWave(waveLabel.Text) > tonumber(macro.Recorded[Step].Wave) ) then
+                    game:GetService("ReplicatedStorage").Remotes.DifficultyVoteReady:FireServer(macro.Recorded[Step].Bool)
+                    Step = Step + 1
+                elseif macro.Recorded[Step].type == "Place" and Cash.Value >= tonumber(macro.Recorded[Step].Cost) then
+                    game:GetService("ReplicatedStorage").Remotes.PlaceTower:InvokeServer(tonumber(macro.Recorded[Step].Number), macro.Recorded[Step].Tower, ToVector3(macro.Recorded[Step].Position), tonumber(macro.Recorded[Step].Int))
+                    Step = Step + 1
+                elseif macro.Recorded[Step].type == "Upgrade" and Cash.Value >= tonumber(macro.Recorded[Step].Cost) then
+                    game:GetService("ReplicatedStorage").Remotes.TowerUpgradeRequest:FireServer(tonumber(macro.Recorded[Step].Tower), tonumber(macro.Recorded[Step].Path))
+                    Step = Step + 1
+                elseif macro.Recorded[Step].type == "Sell" and ( (GetWave(waveLabel.Text) == tonumber(macro.Recorded[Step].Wave) and GetTime(timeLabel) <= tonumber(macro.Recorded[Step].Time)) or GetWave(waveLabel.Text) > tonumber(macro.Recorded[Step].Wave) ) then
+                    game:GetService("ReplicatedStorage").Remotes.SellTower:FireServer(tonumber(macro.Recorded[Step].Tower), tonumber(macro.Recorded[Step].Path))
+                    Step = Step + 1
+                elseif macro.Recorded[Step].type == "Targetting" and ( (GetWave(waveLabel.Text) == tonumber(macro.Recorded[Step].Wave) and GetTime(timeLabel) <= tonumber(macro.Recorded[Step].Time)) or GetWave(waveLabel.Text) > tonumber(macro.Recorded[Step].Wave)  ) then
+                    game:GetService("ReplicatedStorage").Remotes.ChangeQueryType:FireServer(macro.Recorded[Step].Tower, macro.Recorded[Step].Targetting)
+                    Step = Step + 1
+                elseif macro.Recorded[Step].type == "Ability" and ( (GetWave(waveLabel.Text) == tonumber(macro.Recorded[Step].Wave) and GetTime(timeLabel) <= tonumber(macro.Recorded[Step].Time)) or GetWave(waveLabel.Text) > tonumber(macro.Recorded[Step].Wave) ) then
+                    game:GetService("ReplicatedStorage").Remotes.ChangeQueryType:FireServer(macro.Recorded[Step].Tower, macro.Recorded[Step].Ability)
+                    Step = Step + 1
+                end
+            end
+        end)
+    end
+
+
+    
+    local macroRecord = Window:MakeTab({
+    	Name = "Macro - Record",
+    	Icon = "rbxassetid://9549709162",
+    	PremiumOnly = false
+    })
+    local macroPlay = Window:MakeTab({
+    	Name = "Macro - Play",
+    	PremiumOnly = false
+    })
+    
+    local macroPlaying = false
+    local record = {
+        Name = "...";
+        Map = "...";
+        Status = false;
+        Loadout = {};
+    }
+    
+    local recordParagraph =  macroRecord:AddParagraph("Recording", "")
+    
+    function Refresh()
+        recordParagraph:Set(("Name: %s\nMap: %s\nStatus: %s\nLoadout: %s"):format(record.Name, record.Map, record.Status == true and "Recording" or "Postponed" , concatenateLoadout(record.Loadout)))
+    end
+    
+    Refresh()
+    
+    macroRecord:AddTextbox({
+    	Name = "Name",
+    	Default = "...",
+    	TextDisappear = true,
+    	Callback = function(Value)
+    		if isValidInput(Value) then
+    		    record.Name = Value
+    		    Refresh()
+            end
+    	end
+    })
+    
+    macroRecord:AddDropdown({
+    	Name = "Map",
+    	Default = Maps[1],
+    	Options = Maps,
+    	Callback = function(Value)
+    	    record.Map = Value
+    	    Refresh()
+    	end
+    })
+    
+    macroRecord:AddButton({
+        Name = "Recording",
+        Callback = function(Value)
+        if record.Status ~= true and not macroPlaying  then
+                record.Status = true
+                Refresh()
+                RecordMacro(record.Name, record.Map)
+            end
+        end
+    })
+    
+    macroPlay:AddLabel("Choose strat and start playing!")
+    
+    if Settings.Macro.Path ~= "..." and not isfile(F1.."/"..F2.."/"..F3.."/"..Settings.Macro.Path) then
+        Settings.Macro.Path = "..."
+        SaveSettings()
+    end
+    
+    local chosenMacro = macroPlay:AddParagraph("Macro", "Name: \nMap: \nLoadout: ")
+
+    function UpdateMacro()
+        if Settings.Macro.Path ~= "..." and isfile(F1.."/"..F2.."/"..F3.."/"..Settings.Macro.Path) then
+            local macroData =  game:GetService("HttpService"):JSONDecode(readfile(F1.."/"..F2.."/"..F3.."/"..Settings.Macro.Path))
+            
+            chosenMacro:Set("Macro", ("Name: %s\nMap: %s\nLoadout: %s"):format(Settings.Macro.Path, macroData.Map, concatenateLoadout(macroData.Loadout)))
+        else
+            chosenMacro:Set("Macro", ("Name: %s\nMap: %s\nLoadout: %s"):format(Settings.Macro.Path, "...", "..."))
+        end
+    end
+
+    UpdateMacro()
+
+    local macroList
+    
+    macroList = macroPlay:AddDropdown({
+        Name = "Macros",
+        Default = Settings.Macro.Path,
+        Options = GetMacroFiles(),
+        Callback = function(Value)
+            Settings.Macro.Path = Value
+            
+            UpdateMacro()
+            SaveSettings()
+        end
+    })
+    
+    macroPlay:AddButton({
+    	Name = "Play Macro",
+    	Callback = function()
+            if record.Status ~= true and not macroPlaying == true then
+                macroPlaying = true
+                
+                LoadMacro(F1.."/"..F2.."/"..F3.."/"..Settings.Macro.Path)
+            end
+    	end
+    })
+else
+    local macroPlay = Window:MakeTab({
+    	Name = "Macro - Play",
+    	Icon = "rbxassetid://9549709162",
+    	PremiumOnly = false
+    })
+    local miscellaneous = Window:MakeTab({
+    	Name = "Miscellaneous",
+    	PremiumOnly = false
+    })
+    
+    macroPlay:AddLabel("Choose strat and start playing!")
+    
+    if Settings.Macro.Path ~= "..." and not isfile(F1.."/"..F2.."/"..F3.."/"..Settings.Macro.Path) then
+        Settings.Macro.Path = "..."
+        SaveSettings()
+    end
+    
+    local chosenMacro = macroPlay:AddParagraph("Macro", "Name: \nMap: \nLoadout: ")
+
+    function UpdateMacro()
+        print()
+        if Settings.Macro.Path ~= "..." and isfile(F1.."/"..F2.."/"..F3.."/"..Settings.Macro.Path) then
+            local macroData =  game:GetService("HttpService"):JSONDecode(readfile(F1.."/"..F2.."/"..F3.."/"..Settings.Macro.Path))
+            
+            chosenMacro:Set("Macro", ("Name: %s\nMap: %s\nLoadout: %s"):format(Settings.Macro.Path, macroData.Map, concatenateLoadout(macroData.Loadout)))
+        else
+            chosenMacro:Set("Macro", ("Name: %s\nMap: %s\nLoadout: %s"):format(Settings.Macro.Path, "...", "..."))
+        end
+    end
+
+    UpdateMacro()
+
+    local macroList
+    
+    macroPlay:AddButton({
+    	Name = "Refresh Macros",
+    	Callback = function()
+    	    macroList:Refresh(GetMacroFiles(), true)
+    	end
+    })
+    
+    macroList = macroPlay:AddDropdown({
+        Name = "Macros",
+        Default = Settings.Macro.Path,
+        Options = GetMacroFiles(),
+        Callback = function(Value)
+            Settings.Macro.Path = Value
+            
+            UpdateMacro()
+            SaveSettings()
+        end
+    })
+    
+    local miscellaneousTowerCosts = miscellaneous:AddParagraph("x", " ")
+    
+    function UpdateTower(towerName)
+        local towerData = require(game.ReplicatedStorage.TDX_Shared.Common.Resources.Towers.Configs[towerName])
+        local path1String, path2String = "", ""
+        
+        for i,v in pairs(towerData.UpgradePathData.Path1Data) do
+            if i < 5 then
+                path1String = ("%sLevel %s: %s\n"):format(path1String, i, v.Cost)
+            else
+                path1String = ("%sLevel %s: %s"):format(path1String, i, v.Cost)
+            end
+        end
+        for i,v in pairs(towerData.UpgradePathData.Path2Data) do
+            path2String = ("%sLevel %s: %s\n"):format(path2String, i, v.Cost)
+        end
+        
+        miscellaneousTowerCosts:Set(towerName, ("Placement Cost: %s\n\nPath 1:\n%s\n\nPath 2:\n%s"):format(towerData.UpgradePathData.BaseLevelData.Cost, path1String, path2String))
+    end
+    
+    local towerNames = {}
+    
+    for i,v in pairs(game.ReplicatedStorage.TDX_Shared.Common.Resources.Towers.Configs:GetChildren()) do
+        table.insert(towerNames, v.Name)
+    end
+
+    UpdateTower(towerNames[1])
+
+    miscellaneous:AddDropdown({
+    	Name = "Tower",
+    	Default = towerNames[1],
+    	Options = towerNames,
+    	Callback = function(Value)
+    	    UpdateTower(Value)
+    	end
+    })
+end
