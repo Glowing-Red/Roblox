@@ -475,6 +475,7 @@ function OrionLib:MakeWindow(WindowConfig)
 	WindowConfig.ConfigFolder = WindowConfig.ConfigFolder or WindowConfig.Name
 	WindowConfig.SaveConfig = WindowConfig.SaveConfig or false
 	WindowConfig.HidePremium = WindowConfig.HidePremium or false
+	WindowConfig.PlayerCard = WindowConfig.PlayerCard or true
 	if WindowConfig.IntroEnabled == nil then
 		WindowConfig.IntroEnabled = true
 	end
@@ -491,9 +492,9 @@ function OrionLib:MakeWindow(WindowConfig)
 			makefolder(WindowConfig.ConfigFolder)
 		end	
 	end
-
+	
 	local TabHolder = AddThemeObject(SetChildren(SetProps(MakeElement("ScrollFrame", Color3.fromRGB(255, 255, 255), 4), {
-		Size = UDim2.new(1, 0, 1, -50)
+		Size = UDim2.new(1, 0, 1, WindowConfig.PlayerCard and -50 or 0)
 	}), {
 		MakeElement("List"),
 		MakeElement("Padding", 8, 0, 0, 8)
@@ -548,7 +549,8 @@ function OrionLib:MakeWindow(WindowConfig)
 		TabHolder,
 		SetChildren(SetProps(MakeElement("TFrame"), {
 			Size = UDim2.new(1, 0, 0, 50),
-			Position = UDim2.new(0, 0, 1, -50)
+			Position = UDim2.new(0, 0, 1, -50),
+			Visible = WindowConfig.PlayerCard
 		}), {
 			AddThemeObject(SetProps(MakeElement("Frame"), {
 				Size = UDim2.new(1, 0, 0, 1)
